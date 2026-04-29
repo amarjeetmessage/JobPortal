@@ -7,6 +7,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/AppError.js";
 import pickUserResponse from "../utils/pickUserResponse.js";
 import { env } from "../config/env.js";
+import { buildProfileUpdates, getUploadedFile } from "../utils/profile.js";
 
 const buildCookieOptions = () => ({
     maxAge: 1 * 24 * 60 * 60 * 1000,
@@ -26,7 +27,7 @@ export const register = asyncHandler(async (req, res) => {
             throw new AppError("Password must be at least 6 characters long.", 400);
         }
 
-        const file = req.file;
+        const file = getUploadedFile(req, "profilePhotoFile");
         let profilePhoto = "";
 
         if (file) {
@@ -97,39 +98,58 @@ export const logout = asyncHandler(async (req, res) => {
         });
 });
 export const updateProfile = asyncHandler(async (req, res) => {
-        const { fullname, email, phoneNumber, bio, skills } = req.body;
-        
-        const file = req.file;
-        let cloudResponse;
-
-        if (file) {
-            const fileUri = getDataUri(file);
-            cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-        }
-
-
-
-        let skillsArray;
-        if(skills){
-            skillsArray = skills.split(",");
-        }
+        const { fullname, email, phoneNumber } = req.body;
+        const resumeFile = getUploadedFile(req, "resumeFile");
+        const profilePhotoFile = getUploadedFile(req, "profilePhotoFile");
         const userId = req.id; // middleware authentication
         let user = await User.findById(userId);
 
         if (!user) {
             throw new AppError("User not found.", 404);
         }
-        // updating data
-        if(fullname) user.fullname = fullname
-        if(email) user.email = email
-        if(phoneNumber)  user.phoneNumber = phoneNumber
-        if(bio) user.profile.bio = bio
-        if(skills) user.profile.skills = skillsArray
-      
-        // resume comes later here...
-        if(cloudResponse){
-            user.profile.resume = cloudResponse.secure_url // save the cloudinary url
-            user.profile.resumeOriginalName = file.originalname // Save the original file name
+
+        const existingUser = await User.findOne({ email });
+        if (email && existingUser && existingUser._id.toString() !== userId) {
+            throw new AppError("Another account already uses this email.", 409);
+        }
+
+        const profileUpdates = buildProfileUpdates(req.body);
+
+        if(fullname) user.fullname = fullname.trim();
+        if(email) user.email = email.trim();
+        if(phoneNumber) {
+            const parsedPhoneNumber = Number(phoneNumber);
+
+            if (Number.isNaN(parsedPhoneNumber)) {
+                throw new AppError("Phone number must contain only numeric characters.", 400);
+            }
+
+            user.phoneNumber = parsedPhoneNumber;
+        }
+
+        user.profile = {
+            ...(user.profile?.toObject?.() || {}),
+            ...profileUpdates,
+        };
+
+        if(resumeFile){
+            const fileUri = getDataUri(resumeFile);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                resource_type: "auto",
+                folder: "job-portal/resumes",
+            });
+
+            user.profile.resume = cloudResponse.secure_url;
+            user.profile.resumeOriginalName = resumeFile.originalname;
+        }
+
+        if(profilePhotoFile){
+            const fileUri = getDataUri(profilePhotoFile);
+            const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                folder: "job-portal/profile-photos",
+            });
+
+            user.profile.profilePhoto = cloudResponse.secure_url;
         }
 
 
