@@ -1,21 +1,29 @@
 import React from 'react'
 import LatestJobCards from './LatestJobCards';
 import { useSelector } from 'react-redux'; 
-
-// const randomJobs = [1, 2, 3, 4, 5, 6, 7, 8];
+import { demoJobs } from '@/data/demoJobs';
 
 const LatestJobs = () => {
     const {allJobs} = useSelector(store=>store.job);
+    const featuredJobs = allJobs.length > 0 ? allJobs.slice(0,6) : demoJobs;
    
     return (
-        <div className='max-w-7xl mx-auto my-20'>
-            <h1 className='text-4xl font-bold'><span className='text-[#6A38C2]'>Latest & Top </span> Job Openings</h1>
-            <div className='grid grid-cols-3 gap-4 my-5'>
+        <section className='my-20'>
+            <div className='mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
+                <div>
+                    <p className='text-sm font-semibold uppercase tracking-[0.24em] text-amber-700'>Live market view</p>
+                    <h1 className='mt-2 text-4xl font-bold text-slate-900'><span className='text-emerald-700'>Latest & top</span> opportunities</h1>
+                </div>
+                <p className='max-w-2xl text-sm leading-6 text-slate-500'>
+                    The homepage now falls back to curated sample roles, so recruiters and interviewers always see a strong marketplace instead of an empty state.
+                </p>
+            </div>
+            <div className='grid gap-5 md:grid-cols-2 xl:grid-cols-3'>
                 {
-                    allJobs.length <= 0 ? <span>No Job Available</span> : allJobs?.slice(0,6).map((job) => <LatestJobCards key={job._id} job={job}/>)
+                    featuredJobs.map((job) => <LatestJobCards key={job._id} job={job}/>)
                 }
             </div>
-        </div>
+        </section>
     )
 }
 

@@ -2,7 +2,7 @@ import React from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Button } from '../ui/button'
 import { Avatar, AvatarImage } from '../ui/avatar'
-import { LogOut, User2 } from 'lucide-react'
+import { BriefcaseBusiness, LogOut, User2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
@@ -28,14 +28,21 @@ const Navbar = () => {
             toast.error(error.response.data.message);
         }
     }
+
     return (
-        <div className='bg-white'>
-            <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
-                <div>
-                    <h1 className='text-2xl font-bold'>Job<span className='text-[#F83002]'>Portal</span></h1>
+        <div className='sticky top-0 z-30 border-b border-slate-200/80 bg-white/85 backdrop-blur-xl'>
+            <div className='mx-auto flex h-20 max-w-7xl items-center justify-between px-4'>
+                <div className='flex items-center gap-3'>
+                    <div className='rounded-2xl bg-slate-950 p-2.5 text-white shadow-lg shadow-slate-300/60'>
+                        <BriefcaseBusiness className='h-5 w-5' />
+                    </div>
+                    <div>
+                        <h1 className='text-2xl font-extrabold tracking-tight text-slate-900'>Talent<span className='text-emerald-700'>Grid</span></h1>
+                        <p className='text-xs uppercase tracking-[0.28em] text-slate-400'>Recruiting OS</p>
+                    </div>
                 </div>
-                <div className='flex items-center gap-12'>
-                    <ul className='flex font-medium items-center gap-5'>
+                <div className='flex items-center gap-8'>
+                    <ul className='hidden items-center gap-6 text-sm font-semibold text-slate-600 md:flex'>
                         {
                             user && user.role === 'recruiter' ? (
                                 <>
@@ -50,14 +57,12 @@ const Navbar = () => {
                                 </>
                             )
                         }
-
-
                     </ul>
                     {
                         !user ? (
                             <div className='flex items-center gap-2'>
-                                <Link to="/login"><Button variant="outline">Login</Button></Link>
-                                <Link to="/signup"><Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Signup</Button></Link>
+                                <Link to="/login"><Button variant="outline" className="rounded-xl border-slate-300 px-5">Login</Button></Link>
+                                <Link to="/signup"><Button className="rounded-xl bg-slate-900 px-5 text-white hover:bg-slate-800">Signup</Button></Link>
                             </div>
                         ) : (
                             <Popover>
@@ -66,8 +71,8 @@ const Navbar = () => {
                                         <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
                                     </Avatar>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-80">
-                                    <div className=''>
+                                <PopoverContent className="w-80 rounded-2xl border-slate-200 p-4">
+                                    <div>
                                         <div className='flex gap-2 space-y-2'>
                                             <Avatar className="cursor-pointer">
                                                 <AvatarImage src={user?.profile?.profilePhoto} alt="@shadcn" />
@@ -77,7 +82,7 @@ const Navbar = () => {
                                                 <p className='text-sm text-muted-foreground'>{user?.profile?.bio}</p>
                                             </div>
                                         </div>
-                                        <div className='flex flex-col my-2 text-gray-600'>
+                                        <div className='my-2 flex flex-col text-gray-600'>
                                             {
                                                 user && user.role === 'student' && (
                                                     <div className='flex w-fit items-center gap-2 cursor-pointer'>
@@ -97,10 +102,8 @@ const Navbar = () => {
                             </Popover>
                         )
                     }
-
                 </div>
             </div>
-
         </div>
     )
 }

@@ -24,4 +24,8 @@ const companySchema = new mongoose.Schema({
         required:true
     }
 },{timestamps:true})
+
+companySchema.index({ userId: 1, createdAt: -1 });
+companySchema.index({ name: 1 }, { unique: true });
+
 export const Company = mongoose.model("Company", companySchema);

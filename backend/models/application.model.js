@@ -17,4 +17,9 @@ const applicationSchema = new mongoose.Schema({
         default:'pending'
     }
 },{timestamps:true});
+
+applicationSchema.index({ applicant: 1, createdAt: -1 });
+applicationSchema.index({ job: 1, createdAt: -1 });
+applicationSchema.index({ job: 1, applicant: 1 }, { unique: true });
+
 export const Application  = mongoose.model("Application", applicationSchema);
