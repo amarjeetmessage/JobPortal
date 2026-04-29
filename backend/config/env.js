@@ -19,8 +19,13 @@ export const env = {
     get jwtSecret() {
         return process.env.SECRET_KEY;
     },
-    get clientUrl() {
-        return process.env.CLIENT_URL || "http://localhost:5173";
+    get clientUrls() {
+        const rawClientUrls = process.env.CLIENT_URL || "http://localhost:5173";
+
+        return rawClientUrls
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean);
     },
     get cloudinaryCloudName() {
         return process.env.CLOUD_NAME;

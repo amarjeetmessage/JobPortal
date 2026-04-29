@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { useDispatch, useSelector } from 'react-redux'
 import { setLoading } from '@/redux/authSlice'
 import { Loader2 } from 'lucide-react'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 const Signup = () => {
 
@@ -56,7 +57,7 @@ const Signup = () => {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            toast.error(getErrorMessage(error));
         } finally{
             dispatch(setLoading(false));
         }

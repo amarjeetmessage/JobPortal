@@ -13,7 +13,7 @@ services:
       - key: PORT
         value: 10000
       - key: CLIENT_URL
-        value: https://job-portal-frontend.onrender.com
+        value: http://localhost:5173,https://job-portal-frontend-j3z4.onrender.com
       - key: MONGO_URI
         sync: false
       - key: SECRET_KEY
@@ -39,4 +39,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://job-portal-backend.onrender.com/api/v1
+        value: https://job-portal-backend-3p8v.onrender.com/api/v1
